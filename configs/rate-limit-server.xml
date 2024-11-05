@@ -1,0 +1,41 @@
+<config>
+    <log path="/var/log/rate-limit-server/error.log" level="info" />
+
+    <timeout desc="the unit is ms">
+        <frontend_read_header value="2000" />
+        <frontend_read value="5000" />
+        <frontend_write value="-1" />
+        <frontend_idle value="30000" />
+	</timeout>
+
+    <maxsize desc="the unit is KB">
+        <client_request_header value="16" />
+        <client_request_body value="10240" />
+        <server_to_client_buffer value="10240" desc="when client is slower than server, buffer will increase"/>
+    </maxsize>
+
+    <user_session_redis addr="127.0.0.1:6379" pool_size="50" cluster="false"/>
+
+    <rate_limit_redis addr="127.0.0.1:6379" pool_size="50" cluster="false"/>
+
+	<backend>
+		<max_connections_per_host value="50" />
+        <load_balance_mode value="round-robin" />
+        <server addr="127.0.0.1:80" />
+        <server addr="127.0.0.1:81" />
+    </backend>
+
+    <frontend bind="0.0.0.0:8002" maxcon="10000">
+    </frontend>
+
+    <rate_limit_with_ip desc="use ip as key">
+        <url value="/article/{id:[0-9]+}" method="GET" limit_param="15 30 60" />
+        <url value="/get_text" method="GET" limit_param="15 30 60" />
+        <url value="/CLion-2024.2.2.exe" method="GET" limit_param="15 30 60" />
+    </rate_limit_with_ip>
+
+    <rate_limit_with_token desc="use token as key">
+        <url value="/article/new" method="POST" limit_param="5 5 60" />
+        <url value="/article/{id:[0-9]+}" method="GET" limit_param="300 300 60" />
+    </rate_limit_with_token>
+</config>
