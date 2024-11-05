@@ -41,3 +41,9 @@ server {
         }
 }
 ```
+## 优势和劣势
+### 优势
+相对于方案1，rate-limit-server简单，无需再考虑负载均衡、安全性等问题，rate-limit-server只需考虑可用性和性能即可。
+
+### 劣势
+rate-limit-server占用了auth_request这个指令，可能需要新开发一个新的指令rate_limit来专门处理。
