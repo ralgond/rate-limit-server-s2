@@ -29,6 +29,7 @@
     </frontend>
 
     <rate_limit_with_ip desc="use ip as key">
+        <url value="/article/new" method="POST" limit_param="15 30 60" />
         <url value="/article/{id:[0-9]+}" method="GET" limit_param="15 30 60" />
         <url value="/get_text" method="GET" limit_param="15 30 60" />
         <url value="/CLion-2024.2.2.exe" method="GET" limit_param="15 30 60" />

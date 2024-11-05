@@ -33,6 +33,10 @@ func handle(ctx *fasthttp.RequestCtx) {
 		}
 	}
 
+	xRealMethod := string(ctx.Request.Header.Peek("X-Real-Method"))
+
+	log.Printf("body_size:%d\n", len(ctx.Request.Body()))
+
 	URL, err := url.Parse(string(ctx.Request.URI().FullURI()))
 	if err != nil {
 		ctx.Error("StatusInternalServerError", fasthttp.StatusInternalServerError)
@@ -42,15 +46,15 @@ func handle(ctx *fasthttp.RequestCtx) {
 	shouldBeLimited := false
 	sessionId := string(ctx.Request.Header.Cookie("sessionId"))
 	if sessionId == "" {
-		//log.Printf("====>ShouldBlockWithIP: addr=%v, method=%s, URL=%s", ctx.RemoteAddr().String(),
-		//	string(ctx.Request.Header.Method()),
-		//	URL.String())
-		_shouldBeLimited, _matched, err1 := rlS2.ShouldBlockWithIP(string(ctx.Request.Header.Method()), URL, ctx, xRealIP)
+		log.Printf("====>ShouldBlockWithIP: addr=%v, method=%s, URL=%s",
+			ctx.RemoteAddr().String(), xRealMethod, URL.String())
+		_shouldBeLimited, _matched, err1 := rlS2.ShouldBlockWithIP(xRealMethod, URL, ctx, xRealIP)
 		if err1 != nil {
 			ctx.Error("StatusInternalServerError", fasthttp.StatusInternalServerError)
 			return
 		}
 		if !_matched {
+			log.Println("here 2.")
 			ctx.Error("StatusForbidden", fasthttp.StatusForbidden)
 			return
 		}
